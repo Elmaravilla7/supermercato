@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.User;
 public class BaseLogin extends WebSecurityConfigurerAdapter
 {
 	private static String REALM = "DOMINIO";
+	private static final String[] USER_MATCHER = { "/api/articoli/ricerca/**"};
+	private static final String[] ADMIN_MATCHER = { "/api/articoli/inserisci/**", "/api/articoli/elimina/**" };
 	
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder()
@@ -51,9 +53,24 @@ public class BaseLogin extends WebSecurityConfigurerAdapter
 		return manager;
 				
 	}
-	
-	private static final String[] USER_MATCHER = { "/api/articoli/ricerca/**"};
-	private static final String[] ADMIN_MATCHER = { "/api/articoli/inserisci/**", "/api/articoli/elimina/**" };
+
+	public void createUser(String name, String password) throws Exception {
+
+		UserBuilder users = User.builder();
+
+		InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+
+		if(manager.userExists(name)){
+			throw new Exception("Nome utente esistente, usarne uno diverso!");
+		}
+
+		manager.createUser(
+				users
+						.username(name)
+						.password(new BCryptPasswordEncoder().encode(password))
+						.roles("USER")
+						.build());
+	}
 	
 	@Override
 	protected void configure(HttpSecurity http) 
