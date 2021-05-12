@@ -1,6 +1,7 @@
 package com.sdistribuiti.supermercato.service;
 
 import com.sdistribuiti.supermercato.repository.ArticoliRepository;
+import com.sdistribuiti.supermercato.utility.exception.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sdistribuiti.supermercato.mapper.ArticoliDTO;
@@ -49,27 +50,56 @@ public class ArticoliServiceImpl implements ArticoliService
 	}
 
 	@Override
-	public ArticoliDTO catchFromCodArtDTO(String codArt)
-	{
-		Articoli articoli = articoliRepo.findByCodArt(codArt);
+	public ArticoliDTO catchFromCodArtDTO(String codArt) throws NotFoundException {
 
-		ArticoliDTO artDto = null;
-
-
-		if (articoli != null)
-		{
-			artDto =  mapper.map(articoli, ArticoliDTO.class);
-
-			artDto.setDescrizione(artDto.getDescrizione().trim());
-			artDto.setUm(artDto.getUm().trim());
-			artDto.setIdStatoArt(artDto.getIdStatoArt().trim());
-
+		if(!articoliRepo.existsById(codArt)){
+			throw new NotFoundException("L'articolo con codice non è stato trovato!");
 		}
 
-		return artDto;
+		ArticoliDTO artDTO = mapper.map(articoliRepo.findByCodArt(codArt), ArticoliDTO.class);;
+		artDTO.setDescrizione(artDTO.getDescrizione().trim());
+		artDTO.setUm(artDTO.getUm().trim());
+		artDTO.setIdStatoArt(artDTO.getIdStatoArt().trim());
 
-		
+		return artDTO;
+
 	}
+
+	@Override
+	public ArticoliDTO catchFromBarcodeDTO(String barcode) throws NotFoundException {
+
+
+		Articoli art = articoliRepo.catchByBarcode(barcode);
+
+		if (art == null) {
+			throw new NotFoundException("L'articolo con codice non è stato trovato!");
+		}
+
+		ArticoliDTO artDTO =  mapper.map(art, ArticoliDTO.class);
+		artDTO.setDescrizione(artDTO.getDescrizione().trim());
+		artDTO.setUm(artDTO.getUm().trim());
+		artDTO.setIdStatoArt(artDTO.getIdStatoArt().trim());
+
+		return artDTO;
+
+	}
+
+	@Override
+	public List<ArticoliDTO> catchFromDescrizioneDTO(String descrizione) throws NotFoundException {
+
+		try{
+			List<Articoli> art = articoliRepo.catchByDescrizioneLike(descrizione);
+			art.forEach(e -> e.setIdStatoArt(e.getIdStatoArt().trim()));
+			art.forEach(e -> e.setUm(e.getUm().trim()));
+			art.forEach(e -> e.setDescrizione(e.getDescrizione().trim()));
+			return art.stream().map(source -> mapper.map(source, ArticoliDTO.class)).collect(Collectors.toList());
+
+		}catch (Exception e){
+			throw new NotFoundException("Non è stato trovato alcun articolo avente descrizione");
+		}
+
+	}
+
 
 	@Override
 	public List<Articoli> catchFromDescrizione(String descrizione, Pageable pageable)
@@ -78,47 +108,13 @@ public class ArticoliServiceImpl implements ArticoliService
 	}
 
 	@Override
-	public List<ArticoliDTO> catchFromDescrizione(String descrizione)
-	{
-		List<Articoli> art = articoliRepo.catchByDescrizioneLike(descrizione);
-		
-		art.forEach(e -> e.setIdStatoArt(e.getIdStatoArt().trim()));
-		art.forEach(e -> e.setUm(e.getUm().trim()));
-		art.forEach(e -> e.setDescrizione(e.getDescrizione().trim()));
-		
-		return art.stream().map(source -> mapper.map(source, ArticoliDTO.class)).collect(Collectors.toList());
-
-	}
-
-	@Override
-	public Articoli SelByBarcode(String barcode)
+	public Articoli catchFromBarcode(String barcode)
 	{
 		return articoliRepo.catchByBarcode(barcode);
 	}
 
 	
-	@Override
-	public ArticoliDTO SelByBarcodeDTO(String barcode)
-	{
-		Articoli articoli = articoliRepo.catchByBarcode(barcode);
 
-		ArticoliDTO artDto = null;
-
-		if (articoli != null)
-		{
-			artDto =  mapper.map(articoli, ArticoliDTO.class);
-
-			artDto.setDescrizione(artDto.getDescrizione().trim());
-			artDto.setUm(artDto.getUm().trim());
-			artDto.setIdStatoArt(artDto.getIdStatoArt().trim());
-
-		}
-
-		return artDto;
-		
-
-		
-	}
 	
 	
 	
