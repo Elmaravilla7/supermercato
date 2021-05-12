@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sdistribuiti.supermercato.entity.Articoli;
 
 
 @RestController
@@ -48,6 +49,14 @@ public class ArticoliController {
         return new ResponseEntity<ArticoliDTO>(articoliServ.catchFromCodArtDTO(codArt), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/ricerca/fromdescrizione/{descrizione}", produces = "application/json")
+    public ResponseEntity<List<ArticoliDTO>> searchByDesc(@PathVariable("descrizione") String descr)
+            throws Exception
+    {
+
+        return new ResponseEntity<List<ArticoliDTO>>(articoliServ.catchFromDescrizioneDTO("%" + descr.toUpperCase() + "%"), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/ricerca/frombarcode/{barcode}", produces = "application/json")
     public ResponseEntity<ArticoliDTO> searchByBarcode(@PathVariable("barcode") String barCode)
             throws NotFoundException
@@ -56,13 +65,33 @@ public class ArticoliController {
 
     }
 
-    @GetMapping(value = "/ricerca/fromdescrizione/{descrizione}", produces = "application/json")
-    public ResponseEntity<List<ArticoliDTO>> searchByDesc(@PathVariable("descrizione") String descr)
-            throws Exception
+    //vale anche come modifica
+    @PostMapping(value = "/inserisci")
+    public ResponseEntity<?> inserisciArticolo(@Valid @RequestBody Articoli articolo, BindingResult bindingResult)
+            throws BindingException
     {
+        if (bindingResult.hasErrors())
+        {
+            throw new BindingException(errMessage.getMessage(bindingResult.getFieldError(), LocaleContextHolder.getLocale()));
+        }
 
-        return new ResponseEntity<List<ArticoliDTO>>(articoliServ.catchFromDescrizioneDTO("%" + descr.toUpperCase() + "%"), HttpStatus.OK);
+        articoliServ.inserisci(articolo);
+
+        return new ResponseEntity<>(String.format("Inserimento ok!"), new HttpHeaders(), HttpStatus.CREATED);
     }
+
+
+    @RequestMapping(value = "/elimina/{codart}", method = RequestMethod.DELETE, produces = "application/json" )
+    public ResponseEntity<?> eliminaArticolo(@PathVariable("codart") String codArt)
+            throws NotFoundException
+    {
+        articoliServ.elimina(codArt);
+
+        return new ResponseEntity<>(String.format("Eliminazione ok!"), new HttpHeaders(), HttpStatus.OK);
+
+    }
+
+
 
 
 

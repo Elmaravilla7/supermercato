@@ -35,14 +35,21 @@ public class ArticoliServiceImpl implements ArticoliService
 	@Transactional
 	public void inserisci(Articoli articolo)
 	{
+
 		articoliRepo.save(articolo);
 	}
 
 	@Override
 	@Transactional
-	public void elimina(Articoli articolo)
+	public void elimina(String codArt)throws NotFoundException
 	{
-		articoliRepo.delete(articolo);
+		Articoli art= articoliRepo.findByCodArt(codArt);
+
+		if(art==null){
+			throw new NotFoundException("L'articolo non esite!");
+		}
+
+		articoliRepo.delete(art);
 	}
 
 	public Articoli catchFromCodArt(String codArt) {
@@ -53,29 +60,10 @@ public class ArticoliServiceImpl implements ArticoliService
 	public ArticoliDTO catchFromCodArtDTO(String codArt) throws NotFoundException {
 
 		if(!articoliRepo.existsById(codArt)){
-			throw new NotFoundException("L'articolo con codice non è stato trovato!");
+			throw new NotFoundException("L'articolo non è stato trovato!");
 		}
 
 		ArticoliDTO artDTO = mapper.map(articoliRepo.findByCodArt(codArt), ArticoliDTO.class);;
-		artDTO.setDescrizione(artDTO.getDescrizione().trim());
-		artDTO.setUm(artDTO.getUm().trim());
-		artDTO.setIdStatoArt(artDTO.getIdStatoArt().trim());
-
-		return artDTO;
-
-	}
-
-	@Override
-	public ArticoliDTO catchFromBarcodeDTO(String barcode) throws NotFoundException {
-
-
-		Articoli art = articoliRepo.catchByBarcode(barcode);
-
-		if (art == null) {
-			throw new NotFoundException("L'articolo con codice non è stato trovato!");
-		}
-
-		ArticoliDTO artDTO =  mapper.map(art, ArticoliDTO.class);
 		artDTO.setDescrizione(artDTO.getDescrizione().trim());
 		artDTO.setUm(artDTO.getUm().trim());
 		artDTO.setIdStatoArt(artDTO.getIdStatoArt().trim());
@@ -99,6 +87,27 @@ public class ArticoliServiceImpl implements ArticoliService
 		}
 
 	}
+
+	@Override
+	public ArticoliDTO catchFromBarcodeDTO(String barcode) throws NotFoundException {
+
+
+		Articoli art = articoliRepo.catchByBarcode(barcode);
+
+		if (art == null) {
+			throw new NotFoundException("L'articolo con codice non è stato trovato!");
+		}
+
+		ArticoliDTO artDTO =  mapper.map(art, ArticoliDTO.class);
+		artDTO.setDescrizione(artDTO.getDescrizione().trim());
+		artDTO.setUm(artDTO.getUm().trim());
+		artDTO.setIdStatoArt(artDTO.getIdStatoArt().trim());
+
+		return artDTO;
+
+	}
+
+
 
 
 	@Override

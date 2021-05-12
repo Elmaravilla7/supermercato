@@ -14,7 +14,7 @@ public interface ArticoliService
 
 	public void inserisci(Articoli articolo);
 
-	public void elimina(Articoli articolo);
+	public void elimina(String codArt) throws NotFoundException;
 
 	public Articoli catchFromCodArt(String codArt);
 
