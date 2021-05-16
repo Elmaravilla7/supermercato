@@ -52,6 +52,7 @@ public class ArticoliServiceImpl implements ArticoliService
 		articoliRepo.delete(art);
 	}
 
+	@Override
 	public Articoli catchFromCodArt(String codArt) {
 		return articoliRepo.findByCodArt(codArt);
 	}
