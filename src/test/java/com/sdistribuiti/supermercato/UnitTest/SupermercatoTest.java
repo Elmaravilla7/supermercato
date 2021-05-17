@@ -27,9 +27,9 @@ public class SupermercatoTest
 	@Test
 	public void TestFindByCodArt() throws Exception
 	{
-		Assertions.assertThat(articoliRepo.findByCodArt("80066987"))
+		Assertions.assertThat(articoliRepo.findByCodArt("7999182"))
 				.extracting(Articoli::getDescrizione)
-				.isEqualTo("Pane Fresco F.lli Rossi");
+				.isEqualTo("GHIACCIO 2LT IS MORI");
 	}
 
 	@Test
@@ -50,9 +50,9 @@ public class SupermercatoTest
 	@Test
 	public void TestCatchByBarcode() throws Exception
 	{
-		Assertions.assertThat(articoliRepo.catchByBarcode("8008490000021"))
+		Assertions.assertThat(articoliRepo.catchByBarcode("9989980422990"))
 				.extracting(Articoli::getDescrizione)
-				.isEqualTo("ACQUA ULIVETO 15 LT");
+				.isEqualTo("GHIACCIO 2LT IS MORI");
 				
 	}
 	
