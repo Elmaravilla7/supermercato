@@ -30,7 +30,7 @@ import com.sdistribuiti.supermercato.entity.Articoli;
 
 @RestController
 @RequestMapping("api/articoli")
-@CrossOrigin(origins="http://localhost:5051")
+@CrossOrigin(origins="http://localhost:4200")
 public class ArticoliController {
 
     @Autowired
