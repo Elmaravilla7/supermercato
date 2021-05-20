@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -81,9 +82,13 @@ public class ArticoliController {
 
     @RequestMapping(value = "/elimina/{codart}", method = RequestMethod.DELETE, produces = "application/json" )
     public ResponseEntity<?> eliminaArticolo(@PathVariable("codart") String codArt)
-            throws NotFoundException
+            throws DataIntegrityViolationException,NotFoundException
     {
-        articoliServ.elimina(codArt);
+        try {
+            articoliServ.elimina(codArt);
+        }catch(DataIntegrityViolationException e){
+            return new ResponseEntity<>(String.format("Prima di porcedere eliminare articolo dal listino prezzi"), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
 
         return new ResponseEntity<>(String.format("Eliminazione ok!"), new HttpHeaders(), HttpStatus.OK);
 
