@@ -71,7 +71,7 @@ public class ArticoliController {
     {
         if (bindingResult.hasErrors())
         {
-            throw new BindingException(errMessage.getMessage(bindingResult.getFieldError(), LocaleContextHolder.getLocale()));
+            return new ResponseEntity<>(String.format("Sintassi errata!"), new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
 
         articoliServ.inserisci(articolo);
