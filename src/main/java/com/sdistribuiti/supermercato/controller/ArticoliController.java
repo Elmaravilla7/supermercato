@@ -1,6 +1,7 @@
 package com.sdistribuiti.supermercato.controller;
 
 import com.sdistribuiti.supermercato.mapper.*;
+import com.sdistribuiti.supermercato.utility.InfoMsg;
 import com.sdistribuiti.supermercato.utility.exception.*;
 import com.sdistribuiti.supermercato.service.*;
 import java.util.List;
@@ -67,30 +68,32 @@ public class ArticoliController {
     //vale anche come modifica
     @PostMapping(value = "/inserisci")
     public ResponseEntity<?> inserisciArticolo(@Valid @RequestBody Articoli articolo, BindingResult bindingResult)
-            throws BindingException
-    {
+            throws BindingException, IllegalArgumentException{
         if (bindingResult.hasErrors())
         {
-            return new ResponseEntity<>(String.format("Sintassi errata!"), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
+        try {
+        articoliServ.inserisci(articolo);
+        }catch(Exception e){
+            return new ResponseEntity<>(new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
 
-        articoliServ.inserisci(articolo);
-
-        return new ResponseEntity<>(String.format("Inserimento ok!"), new HttpHeaders(), HttpStatus.CREATED);
+        return new ResponseEntity<>(new HttpHeaders(), HttpStatus.CREATED);
     }
 
 
     @RequestMapping(value = "/elimina/{codart}", method = RequestMethod.DELETE, produces = "application/json" )
-    public ResponseEntity<?> eliminaArticolo(@PathVariable("codart") String codArt)
+    public ResponseEntity<InfoMsg> eliminaArticolo(@PathVariable("codart") String codArt)
             throws DataIntegrityViolationException,NotFoundException
     {
         try {
             articoliServ.elimina(codArt);
         }catch(DataIntegrityViolationException e){
-            return new ResponseEntity<>(String.format("Prima di porcedere eliminare articolo dal listino prezzi"), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<InfoMsg>(new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(String.format("Eliminazione ok!"), new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<InfoMsg>(new HttpHeaders(), HttpStatus.OK);
 
     }
 

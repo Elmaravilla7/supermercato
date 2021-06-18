@@ -12,7 +12,7 @@ public interface ArticoliService
 {
 	public Iterable<Articoli> catchAll();
 
-	public void inserisci(Articoli articolo);
+	public void inserisci(Articoli articolo) throws IllegalArgumentException;
 
 	public void elimina(String codArt) throws NotFoundException;
 

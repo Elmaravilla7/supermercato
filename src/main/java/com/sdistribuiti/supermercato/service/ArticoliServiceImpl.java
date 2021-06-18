@@ -1,6 +1,8 @@
 package com.sdistribuiti.supermercato.service;
 
 import com.sdistribuiti.supermercato.repository.ArticoliRepository;
+import com.sdistribuiti.supermercato.repository.FamAssortRepository;
+import com.sdistribuiti.supermercato.repository.IvaRepository;
 import com.sdistribuiti.supermercato.utility.exception.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,12 @@ public class ArticoliServiceImpl implements ArticoliService
 {
 	@Autowired
     ArticoliRepository articoliRepo;
+
+	@Autowired
+	IvaRepository ivaRepo;
+
+	@Autowired
+	FamAssortRepository famAssortRepo;
 	
 	@Autowired
 	private ModelMapper mapper;
@@ -33,8 +41,14 @@ public class ArticoliServiceImpl implements ArticoliService
 
 	@Override
 	@Transactional
-	public void inserisci(Articoli articolo)
-	{
+	public void inserisci(Articoli articolo) throws IllegalArgumentException {
+		if(!famAssortRepo.existsById(articolo.getFamAssort().getId())){
+			throw new IllegalArgumentException("Id FamAssort non esistente!");
+		}
+		if(!ivaRepo.existsById(articolo.getIva().getIdIva())){
+
+			throw new IllegalArgumentException("Id iva non esistente!");
+		}
 
 		articoliRepo.save(articolo);
 	}
